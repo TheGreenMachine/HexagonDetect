@@ -102,45 +102,14 @@ class Net(nn.Module):
         grad_orientation += 180.0
         grad_orientation =  torch.round( grad_orientation / 45.0 ) * 45.0
 
-        # THIN EDGES (NON-MAX SUPPRESSION)
-
-        all_filtered = self.directional_filter(grad_mag)
-
-        inidices_positive = (grad_orientation / 45) % 8
-        inidices_negative = ((grad_orientation / 45) + 4) % 8
-
-        height = inidices_positive.size()[2]
-        width = inidices_positive.size()[3]
-        pixel_count = height * width
-        pixel_range = torch.FloatTensor([range(pixel_count)])
-        if self.use_cuda:
-            pixel_range = torch.cuda.FloatTensor([range(pixel_count)])
-
-        indices = (inidices_positive.view(-1).data * pixel_count + pixel_range).squeeze()
-        channel_select_filtered_positive = all_filtered.view(-1)[indices.long()].view(1,height,width)
-
-        indices = (inidices_negative.view(-1).data * pixel_count + pixel_range).squeeze()
-        channel_select_filtered_negative = all_filtered.view(-1)[indices.long()].view(1,height,width)
-
-        channel_select_filtered = torch.stack([channel_select_filtered_positive,channel_select_filtered_negative])
-
-        is_max = channel_select_filtered.min(dim=0)[0] > 0.0
-        is_max = torch.unsqueeze(is_max, dim=0)
-
-        thin_edges = grad_mag.clone()
-        thin_edges[is_max==0] = 0.0
-
         # THRESHOLD
-
-        thresholded = thin_edges.clone()
-        thresholded[thin_edges<self.threshold] = 0.0
 
         early_threshold = grad_mag.clone()
         early_threshold[grad_mag<self.threshold] = 0.0
 
-        assert grad_mag.size() == grad_orientation.size() == thin_edges.size() == thresholded.size() == early_threshold.size()
+        assert grad_mag.size() == grad_orientation.size() == early_threshold.size()
 
-        return blurred_img, grad_mag, grad_orientation, thin_edges, thresholded, early_threshold
+        return blurred_img, grad_mag, grad_orientation, early_threshold
 
 
 if __name__ == '__main__':
