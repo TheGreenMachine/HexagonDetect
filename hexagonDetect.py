@@ -36,7 +36,7 @@ def canny(raw_img, shape, use_cuda=False):
     img = early_threshold.data.cpu().numpy()[0, 0]
     return img
 def procImage(img, shape):
-    img = canny(img, hex, use_cuda=True)
+    img = canny(img, hex, use_cuda=False)
     img = np.uint8(img * 255)
     contours, hierarchy = cv2.findContours(img, cv2.RETR_TREE,
                                            cv2.CHAIN_APPROX_SIMPLE)
@@ -77,6 +77,7 @@ if __name__ == '__main__':
     while True:
         retr, img = cap.read()
         img = img / 255.0
+        img = img[0:360, 0:1280]
         img = procImage(img, hex)
         if args.save:
             out.write(img)
