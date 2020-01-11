@@ -1,5 +1,6 @@
 numpy
-pillow
+pillow==6.2.2
 opencv-python
 torch
 torchvision
+scipy
