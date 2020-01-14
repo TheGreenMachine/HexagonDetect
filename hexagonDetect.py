@@ -40,6 +40,7 @@ def procImage(img, shape):
     img = np.uint8(img * 255)
     contours, hierarchy = cv2.findContours(img, cv2.RETR_TREE,
                                            cv2.CHAIN_APPROX_SIMPLE)
+    centerpoints = []
     hexes = []
     for cont in contours:
         rect = cv2.boundingRect(cont)
@@ -50,9 +51,14 @@ def procImage(img, shape):
                 print(f"len(cont)={len(cont):3d}:  match={match:.4f}")
 
             if match < 0.02:
+                cx = rect[0] + (rect[2] * .5)
+                cy = rect[1] + (rect[3] *.5)
+                centerpoints = (cx, cy)
                 hexes.append(cont)
     img = cv2.cvtColor(img, cv2.COLOR_GRAY2BGR)
     img = cv2.drawContours(img, hexes, -1, (0, 255, 0), 4)
+    ctr = np.array(centerpoints).reshape((-1, 1, 2)).astype(np.int32)
+    img = cv2.drawContours(img, ctr, -1, (0, 255, 0), 20)
     return img
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='A tutorial of argparse!')
