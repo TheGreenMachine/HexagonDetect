@@ -3,7 +3,6 @@ import torch
 import torchvision
 import cv2
 from torch.autograd import Variable
-from net_canny import Net
 import numpy as np
 import math
 
@@ -18,23 +17,6 @@ def make_hex_shape():
     shape_np = np.array(pts, np.int32)
     shape_np = np.reshape(shape_np, (-1, 1, 2))
     return shape_np
-
-def canny(raw_img, shape, use_cuda=False):
-    img = torch.from_numpy(raw_img.transpose((2, 0, 1)))
-    batch = torch.stack([img]).float()
-
-    net = Net(threshold=4.0, use_cuda=use_cuda)
-    if use_cuda:
-        net.cuda()
-    net.eval()
-
-    data = Variable(batch)
-    if use_cuda:
-        data = Variable(batch).cuda()
-
-    blurred_img, grad_mag, grad_orientation, early_threshold = net(data)
-    img = early_threshold.data.cpu().numpy()[0, 0]
-    return img
 def procImage(img, shape):
     edges = cv2.Canny(img, 100, 300)
 
