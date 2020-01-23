@@ -1,8 +1,5 @@
 import argparse
-import torch
-import torchvision
 import cv2
-from torch.autograd import Variable
 import numpy as np
 import math
 
@@ -72,13 +69,13 @@ if __name__ == '__main__':
     cv2.createTrackbar("lower", "edges", 0, 100, sliderUpdate)
     while True:
         retr, img = cap.read()
-        img = img[0:360, 0:1280]
+        img = cv2.rotate(img, cv2.ROTATE_90_CLOCKWISE)
 
         img = procImage(img, hex, lowerbound)
         if args.save:
             out.write(img)
         cv2.imshow("contours", img)
-        if cv2.waitKey(30) & 0xFF == ord('q'):
+        if cv2.waitKey(1) & 0xFF == ord('q'):
             break
     cap.release()
     out.release()
