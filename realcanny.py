@@ -36,7 +36,8 @@ def procImage(img, shape, val):
             match = cv2.matchShapes(cont, hex, cv2.CONTOURS_MATCH_I2, 0.0)
             if match < 0.08:
                 print("SKIP")
-            if match < .0165:
+            # .0165 if not working
+            if match < .01:
                 cx = rect[0] + (rect[2] * .5)
                 cy = rect[1] + (rect[3] * .5)
                 centerpoints = (cx, cy)
@@ -69,8 +70,7 @@ if __name__ == '__main__':
     cv2.createTrackbar("lower", "edges", 0, 100, sliderUpdate)
     while True:
         retr, img = cap.read()
-        img = cv2.rotate(img, cv2.ROTATE_90_CLOCKWISE)
-
+        img = img[0:360, 0:1280]
         img = procImage(img, hex, lowerbound)
         if args.save:
             out.write(img)
