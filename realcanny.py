@@ -16,7 +16,9 @@ def make_hex_shape():
     shape_np = np.reshape(shape_np, (-1, 1, 2))
     return shape_np
 def procImage(img):
-    global oldframe, count
+    global oldframe, count, centerframex, centerframey, cx, cy
+    centerframey = img.shape[0] * 0.5
+    centerframex = img.shape[1] * 0.5
     edges = cv2.Canny(img, 100, 300)
 
     cv2.imshow("edges", edges)
@@ -35,7 +37,8 @@ def procImage(img):
                 if oldframe == 0:
                     continue
                 img = cv2.drawContours(img, oldframe[0], -1, (0, 255, 0), 3)
-                img = cv2.drawContours(img, oldframe[1], -1, (0, 255, 0), 20)
+                img = cv2.drawContours(img, oldframe[1], -1, (0, 0, 255), 20)
+                cv2.line(img, (int(cx), int(cy)), (int(centerframex), int(centerframey)), (0, 0, 255), thickness=5)
                 if count > 2:
                     oldframe = 0
                     count = 0
@@ -54,8 +57,10 @@ def procImage(img):
                 hexes.append(cont)
                 img = cv2.drawContours(img, hexes, -1, (0, 255, 0), 3)
                 ctr = np.array(centerpoints).reshape((-1, 1, 2)).astype(np.int32)
-                img = cv2.drawContours(img, ctr, -1, (0, 255, 0), 20)
-                oldframe = [hexes, ctr]
+                img = cv2.drawContours(img, ctr, -1, (0, 0, 255), 20)
+                line = cv2.line(img, (int(cx), int(cy)), (int(centerframex), int(centerframey)), (0, 0, 255), thickness=5)
+
+                oldframe = [hexes, ctr, line]
 
     return img
 if __name__ == '__main__':
@@ -70,7 +75,6 @@ if __name__ == '__main__':
     hex = make_hex_shape()
     print(args)
     if args.source != None:
-
         src = args.source
 
     cap = cv2.VideoCapture(src)
@@ -81,9 +85,9 @@ if __name__ == '__main__':
     cv2.namedWindow("edges")
     while True:
         retr, img = cap.read()
-        # img = cv2.rotate(img, cv2.ROTATE_90_CLOCKWISE)
-        # img = cv2.resize(img, None, fx=0.25, fy=0.25)
-        img = img[0:360, 0:1280]
+        img = cv2.rotate(img, cv2.ROTATE_90_CLOCKWISE)
+        img = cv2.resize(img, None, fx=0.25, fy=0.25)
+       # img = img[0:360, 0:1280]
         img = procImage(img)
         if args.save:
             out.write(img)
