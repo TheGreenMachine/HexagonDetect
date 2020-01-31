@@ -77,7 +77,7 @@ if __name__ == '__main__':
     if args.source != None:
         src = args.source
 
-    cap = cv2.VideoCapture(src)
+    cap = cv2.VideoCapture("autovideosrc ! videoconvert ! appsink", cv2.CAP_GSTREAMER)
     if args.save:
         frame_width = int(cap.get(3))
         frame_height = int(cap.get(4))
@@ -85,9 +85,9 @@ if __name__ == '__main__':
     cv2.namedWindow("edges")
     while True:
         retr, img = cap.read()
-        img = cv2.rotate(img, cv2.ROTATE_90_CLOCKWISE)
-        img = cv2.resize(img, None, fx=0.25, fy=0.25)
-       # img = img[0:360, 0:1280]
+        # img = cv2.rotate(img, cv2.ROTATE_90_CLOCKWISE)
+        # img = cv2.resize(img, None, fx=0.25, fy=0.25)
+        img = img[0:360, 0:1280]
         img = procImage(img)
         if args.save:
             out.write(img)
